@@ -5,32 +5,13 @@ echo ======================================================================
 echo                VENDOPS FULL-STACK LAUNCHER (WEB UI + API)
 echo ======================================================================
 
-echo [1/4] Ensuring Docker Desktop is running...
-powershell -NoProfile -Command "if (!(Get-Process 'Docker Desktop' -ErrorAction SilentlyContinue)) { if (Test-Path 'C:\Program Files\Docker\Docker\Docker Desktop.exe') { Write-Host 'Launching Docker Desktop...'; Start-Process 'C:\Program Files\Docker\Docker\Docker Desktop.exe' } }"
-
-echo Starting Backend Docker Stack (FastAPI and Qdrant)...
+echo [1/4] Starting Backend Docker Stack (FastAPI and Qdrant)...
 pushd ..\VendOps-Agentic-Harness
-set DOCKER_RETRIES=15
-:wait_docker_engine
-docker compose up -d >nul 2>&1
-if %ERRORLEVEL% EQU 0 (
-    echo [OK] Backend Docker containers launched.
-    goto wait_api_ready
-)
-set /a DOCKER_RETRIES-=1
-if %DOCKER_RETRIES% LEQ 0 (
-    echo [WARNING] Docker daemon still starting. Running compose directly...
-    docker compose up -d
-    goto wait_api_ready
-)
-timeout /t 2 /nobreak >nul
-goto wait_docker_engine
-
-:wait_api_ready
+docker compose up -d
 popd
 
 echo [2/4] Waiting for Backend API health check on http://localhost:8000/health...
-set RETRIES=20
+set RETRIES=15
 :wait_backend
 curl -s -f http://localhost:8000/health >nul 2>&1
 if %ERRORLEVEL% EQU 0 (
@@ -42,7 +23,7 @@ if %RETRIES% LEQ 0 (
     echo [WARNING] Backend health check wait timed out. Continuing...
     goto start_frontend
 )
-timeout /t 1 /nobreak >nul
+ping 127.0.0.1 -n 2 >nul
 goto wait_backend
 
 :start_frontend
