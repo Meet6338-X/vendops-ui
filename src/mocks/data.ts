@@ -1,0 +1,158 @@
+export const MOCK_DISPUTES = [
+  {
+    thread_id: "thread_mock_001_hinglish",
+    message: "Bhai INV-20240103 ka payment abhi tak nahi aaya, PO-20240103 ke against 50 units deliver kar diye the, GRN-20240103 dock intake ho chuka hai. Please check karo.",
+    sender: "billing@acmesupply.co.in",
+    created_at: new Date(Date.now() - 3600000 * 2).toISOString(),
+    status: "RESOLVED",
+    dispute_type: "SHORT_PAYMENT",
+    priority: "HIGH",
+    amount: 25000.0,
+    action: "PARTIAL_PAYMENT",
+    language: "hi-Latn",
+  },
+  {
+    thread_id: "thread_mock_002_english",
+    message: "Invoice INV-20240101 under PO-20240101 was due on Feb 15. Please advise remittance date.",
+    sender: "ap@globalparts.com",
+    created_at: new Date(Date.now() - 3600000 * 6).toISOString(),
+    status: "RESOLVED",
+    dispute_type: "PAYMENT_DELAY",
+    priority: "MEDIUM",
+    amount: 50000.0,
+    action: "RELEASE_PAYMENT",
+    language: "en",
+  },
+  {
+    thread_id: "thread_mock_003_hitl",
+    message: "Discrepancy of $120,000 on INV-20240999 for bulk turbine delivery under PO-20240999.",
+    sender: "cfo@turbinetech.com",
+    created_at: new Date(Date.now() - 1800000).toISOString(),
+    status: "WAITING_APPROVAL",
+    dispute_type: "PRICE_MISMATCH",
+    priority: "URGENT",
+    amount: 120000.0,
+    action: "RELEASE_PAYMENT",
+    language: "en",
+  },
+];
+
+export const MOCK_APPROVALS = [
+  {
+    thread_id: "thread_mock_003_hitl",
+    created_at: new Date(Date.now() - 1800000).toISOString(),
+    raw_message: "Discrepancy of $120,000 on INV-20240999 for bulk turbine delivery under PO-20240999.",
+    interrupt: {
+      reason: "Amount exceeds HIGH_VALUE_THRESHOLD ($100,000.00)",
+      action: "RELEASE_PAYMENT",
+      amount: 120000.0,
+      evidence: [
+        "PO-20240999 unit rate matches invoice line $120,000.00",
+        "GRN-20240999 signed intake inspection confirmed on dock",
+      ],
+      thread_id: "thread_mock_003_hitl",
+    },
+    proposal: {
+      action: "RELEASE_PAYMENT",
+      amount: 120000.0,
+      rationale: "Enterprise PO milestone confirmed by warehouse engineering. Release approved pending director signoff.",
+      evidence: [
+        "PO-20240999 rate: $120,000",
+        "GRN-20240999: 1 Unit received clean",
+      ],
+      confidence: 0.98,
+    },
+    match_result: {
+      invoice_id: "INV-20240999",
+      po_id: "PO-20240999",
+      grn_id: "GRN-20240999",
+      status: "PERFECT_MATCH",
+      discrepancies: [],
+      is_matched: true,
+      billed_amount: 120000.0,
+      authorized_amount: 120000.0,
+    },
+  },
+];
+
+export const MOCK_AUDIT = [
+  {
+    audit_id: "AUD-991A82BC",
+    timestamp: new Date(Date.now() - 3600000).toISOString(),
+    action: "RELEASE_PAYMENT",
+    invoice_id: "INV-20240101",
+    po_id: "PO-20240101",
+    vendor_id: "VND-000001",
+    amount: 50000.0,
+    rationale: "Three-way match confirmed. Automated disbursement released.",
+    idempotency_key: "idemp_1001_8471928374",
+    reviewer_id: "SYS-AUTONOMOUS",
+  },
+  {
+    audit_id: "AUD-442B91AC",
+    timestamp: new Date(Date.now() - 7200000).toISOString(),
+    action: "PARTIAL_PAYMENT",
+    invoice_id: "INV-20240103",
+    po_id: "PO-20240103",
+    vendor_id: "VND-000003",
+    amount: 25000.0,
+    rationale: "Short shipment authorized for 25 units accepted; credit note requested for remaining 25.",
+    idempotency_key: "idemp_1002_9281726354",
+    reviewer_id: "SYS-AUTONOMOUS",
+  },
+];
+
+export const MOCK_EVALS = {
+  gate_passed: true,
+  failures: [],
+  report: {
+    total_cases: 420,
+    overall_tcr: 1.0,
+    overall_wer: 0.006,
+    worst_slice_tcr: 1.0,
+    worst_slice_wer: 0.0482,
+    worst_tcr_slice_name: "script:devanagari",
+    worst_wer_slice_name: "noise_level:high",
+    hallucinated_erp_tool_calls: 0,
+    handling_time_reduction_pct: 97.17,
+    ablation: {
+      token_reduction_pct: 45.92,
+      uncompressed_tokens: 200465,
+      compressed_tokens: 108411,
+      latency_speedup_ms: 25.08,
+      tcr_parity: 0.0,
+    },
+    gate_passed: true,
+    gate_reasons: [],
+  },
+  thresholds: {
+    max_entity_wer: 0.03,
+    min_worst_slice_tcr: 0.85,
+    max_hallucinations: 0,
+  },
+};
+
+export const MOCK_GUARD_EVENTS = [
+  {
+    timestamp: new Date(Date.now() - 3600000 * 3).toISOString(),
+    thread_id: "thread_adv_01",
+    tool_name: "get_invoice",
+    rejected_id: "INV-99999999",
+    id_type: "INVOICE",
+    repair_attempt: 1,
+    must_escalate: false,
+    status: "BLOCKED",
+    message: "Provenance rejection: ID 'INV-99999999' not found in message or ERP history.",
+  },
+  {
+    timestamp: new Date(Date.now() - 3600000 * 5).toISOString(),
+    thread_id: "thread_adv_02",
+    tool_name: "execute_resolution",
+    rejected_id: "UNAUTHORIZED_ACTION",
+    id_type: "SCHEMA_VIOLATION",
+    repair_attempt: 2,
+    must_escalate: true,
+    status: "ESCALATED",
+    message: "ActionType enum constraint breached: free-text mutations strictly forbidden.",
+  },
+];
