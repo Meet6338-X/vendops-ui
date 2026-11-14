@@ -138,7 +138,7 @@ export function ApprovalCard({ item }: ApprovalCardProps) {
               <span>Vendor Query Stream</span>
             </div>
             <p className="text-xs font-sans text-zinc-300 leading-relaxed italic border-l-2 border-blue-500/50 pl-3 py-0.5">
-              "{item.raw_message}"
+              &ldquo;{item.raw_message}&rdquo;
             </p>
           </div>
         )}

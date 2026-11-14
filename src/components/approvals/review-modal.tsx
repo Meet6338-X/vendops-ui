@@ -79,17 +79,6 @@ export function ReviewModal({
     }
   }, [isOpen, initialIntent, proposedAction, proposedAmount]);
 
-  // Handle ESC key to close
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen && !mutation.isPending) {
-        onClose();
-      }
-    };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen]);
-
   const mutation = useMutation({
     mutationFn: async (payload: ResolutionReview) => {
       return resumeDispute(approvalItem.thread_id, payload);
@@ -124,6 +113,17 @@ export function ReviewModal({
       );
     },
   });
+
+  // Handle ESC key to close
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen && !mutation.isPending) {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isOpen, onClose, mutation.isPending]);
 
   if (!isOpen) return null;
 
