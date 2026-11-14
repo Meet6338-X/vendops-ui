@@ -1,6 +1,8 @@
 <div align="center">
 
-# ⚡ VendOps Web UI
+<img src="./public/vendops_logo.svg" alt="VendOps Logo" width="100%" style="max-width: 800px;" />
+
+<br/><br/>
 
 [![Next.js 15](https://img.shields.io/badge/next.js-15.5-black.svg?logo=next.js&logoColor=white)](https://nextjs.org/)
 [![React 19](https://img.shields.io/badge/react-19.3-blue.svg?logo=react&logoColor=white)](https://react.dev/)
@@ -43,6 +45,7 @@ The application contains 8 purpose-built operational interfaces:
 ### 2. `/disputes/new` (Submission Console)
 - **Multi-Dialect Textarea**: Real-time dialect classifier detecting **Hinglish (Roman)**, **Hindi (Devanagari)**, or **English (Formal)** with character counter (`0 / 10,000`).
 - **One-Click Test Scenarios**: Quick-fill presets for Hinglish short delivery, English payment delay, $120,000 HITL high-value gate, and price variance claims.
+- **EasyOCR File Upload**: Extracts raw text, canonical IDs (`INV-...`, `PO-...`, `GRN-...`, `VND-...`), and detected currency amounts from invoice scans or PDFs.
 
 ### 3. `/disputes/[id]` (Live Execution Run View)
 - **Interactive React Flow Graph**: 8 sequential LangGraph nodes (`ingest` ➔ `compress` ➔ `triage` ➔ `verify` ➔ `decide` ➔ `hitl_gate` ➔ `execute` ➔ `respond`). Active node pulses blue; completed nodes glow emerald; paused HITL node pulses orange.
@@ -86,7 +89,7 @@ The application contains 8 purpose-built operational interfaces:
 Both the backend Docker stack and frontend Next.js server can be launched together:
 
 ```cmd
-:: Batch Launcher
+:: Launch everything (Backend Docker + Frontend Web UI)
 start.bat
 
 :: Shutdown everything cleanly
@@ -94,40 +97,24 @@ stop.bat
 ```
 
 ```powershell
-# PowerShell Launcher
+# Native PowerShell Launcher
 .\start.ps1
 
 # Shutdown
 .\stop.ps1
 ```
 
-### 2. Manual Development
-```bash
-# Install dependencies
-bun install   # or npm install
+### 2. Terminal User Interface (TUI)
+For operational debugging or testing without a browser, run:
 
-# Start Next.js development server on port 3000
-bun run dev   # or npm run dev
+```cmd
+:: Launch Terminal TUI
+tui
 ```
-
-### 3. Offline Mock Mode (Runs without Backend)
-To run and demo the full UI with Mock Service Worker (MSW) without a running backend:
-```bash
-# In .env.local or via terminal:
-NEXT_PUBLIC_USE_MOCKS=1 bun run dev
-```
-
----
-
-## 📟 Terminal User Interface (TUI)
-
-For engineers testing headlessly or via SSH, VendOps includes **`vendops-tui`**: a high-ASCII operational terminal dashboard built with box-drawing characters and ANSI color coding:
-
 ```powershell
-# Run the terminal interface
+# or via Python / Bun
 python bin\vendops-tui.py
-# or
-bin\vendops-tui.bat
+bun run tui
 ```
 
 Features:
@@ -135,6 +122,36 @@ Features:
 - Interactive prompt for custom queries
 - Terminal-based HITL approval queue with Approve / Reject keyboard prompts
 - Evaluation & benchmark matrix viewer
+- Multilingual EasyOCR entity extraction test
+
+### 3. Manual Development & Offline Mode
+```bash
+# Install dependencies
+bun install   # or npm install
+
+# Start Next.js development server on port 3000
+bun run dev
+
+# Offline Mock Mode (Runs 100% without backend via MSW)
+NEXT_PUBLIC_USE_MOCKS=1 bun run dev
+```
+
+---
+
+## 🔗 Architecture & Backend Coordination
+
+```
+Browser Client (Port 3000)
+       │
+       ▼
+Next.js Rewrite Proxy (/api/backend/*)
+       │
+       ▼
+FastAPI + LangGraph Service (Port 8000)
+       ├──> Qdrant Vector Store (Port 6333) [FastEmbed Multilingual]
+       ├──> SQLite Mock ERP (MCP 2.x Tools) [Idempotent Mutations]
+       └──> EasyOCR Engine (ocr/easyocr)    [Scanned Invoice Extraction]
+```
 
 ---
 
@@ -148,5 +165,5 @@ Features:
 
 ## 📄 License
 
-Licensed under the [MIT License](LICENSE).
-Vendored subcomponents retain their respective original MIT licenses.
+Licensed under the [MIT License](LICENSE).  
+Vendored subcomponents retain their respective original licenses.
